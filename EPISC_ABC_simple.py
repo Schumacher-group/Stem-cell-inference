@@ -67,7 +67,7 @@ def trajectory_EPISC_X(par,N_init,T):
         rtype = np.append(rtype,idx)
         N_pop += S[idx,:]
         
-        if rtime[-1]>T:
+        if rtime[-1]>T or np.max(N_pop)>=15:
             break
     return N_pop
 
@@ -122,7 +122,7 @@ def trajectory_EPISC_Y(par,N_init,T):
         rtype = np.append(rtype,idx)
         N_pop += S[idx,:]
         
-        if rtime[-1]>T:
+        if rtime[-1]>T or np.max(N_pop)>=15:
             break
     return N_pop
 
@@ -314,7 +314,6 @@ def get_ABC_BF(stat_true,T_marker,marker_unobs, T, N_MC, PAR_MIN, PAR_MAX):
     # loop over ABC iterations
     output_parX = np.zeros((0, 7))
     output_parY = np.zeros((0, 7))
-    par_init = np.ones(7)
     for i in range(0, N_MC):
         print(i)
         # sample parameters from priors (same for X and Y)
@@ -323,12 +322,77 @@ def get_ABC_BF(stat_true,T_marker,marker_unobs, T, N_MC, PAR_MIN, PAR_MAX):
         # Accept/Reject proposed X parameters
         stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
         if stat_decide(stat_simX, stat_true, 0):
-            output_parX = np.vstack([output_parX, par_init])
+            output_parX = np.vstack([output_parX, par])
 
         # Accept/Reject proposed Y parameters
         stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
         if stat_decide(stat_simY, stat_true, 0):
-            output_parY = np.vstack([output_parY, par_init])
+            output_parY = np.vstack([output_parY, par])
 
     print('Finished. Average acceptance prob: ', len(output_parX)/N_MC)
+    return [output_parX,output_parY]
+
+
+# %% Bayes factor of combined CHIR data 
+    
+def stat_diff(stat_sim,stat_true):
+    # abs median deviation and sum over individual cell states
+    med_dev = np.sum(np.abs(stat_sim[1]-stat_true[1]))
+    # mean deviation
+    mean_dev = np.sum(np.abs(stat_sim[0]-stat_true[0]))
+    # std deviation
+    std_dev = np.sum(np.abs(stat_sim[2] - stat_true[2]))
+    return [med_dev,mean_dev,std_dev]
+
+ 
+
+
+def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_MIN, PAR_MAX):
+    # loop over ABC iterations
+    output_parX = np.zeros((0, 7))
+    output_parY = np.zeros((0, 7))
+
+    for i in range(0, N_MC):
+        print(i)
+        # sample parameters from priors (same for X and Y)
+        par = loguniform(PAR_MIN,PAR_MAX,7)
+
+        # iterate over Model X initial coniditions
+        d = np.zeros(3)
+        for ic in range(0,8):
+           T = T_ls[ic]
+           T_marker = T_marker_ls[ic]
+           marker_unobs = marker_unobs_ls[ic]
+           stat_true = stat_true_ls[ic]
+            
+           # calculate summary statistics
+           stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
+           d += stat_diff(stat_simX, stat_true)
+
+        if np.sum(d)<55: # epsilon=55
+            output_parX = np.vstack([output_parX, par])
+
+
+        # iterate over Model Y initial coniditions
+        d = np.zeros(3)
+        for ic in range(0,8):
+            T = T_ls[ic]
+            T_marker = T_marker_ls[ic]
+            marker_unobs = marker_unobs_ls[ic]
+            stat_true = stat_true_ls[ic]
+
+            # calculate summary statistics
+            stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
+            d += stat_diff(stat_simY, stat_true)    
+
+        if np.sum(d)<55: # epsilon=55
+            output_parY = np.vstack([output_parY, par])
+            
+        if i%1000==999:
+            np.save('/home/ruske/Desktop/Stem-cell-inference-master/Test_ModelX',output_parX)
+            np.save('/home/ruske/Desktop/Stem-cell-inference-master/Test_ModelY',output_parY)
+            print('Average acceptance prob for Model X: ', len(output_parX)/N_MC)
+            print('\nAverage acceptance prob for Model Y: ', len(output_parY)/N_MC) 
+  
+
     return [output_parX,output_parY]
