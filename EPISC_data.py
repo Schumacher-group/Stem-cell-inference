@@ -18,7 +18,7 @@ def prior_U(par):
 
 
 
-# %% ABC rejection sampling CHIR
+#%% 1.1 ########### ABC rejection sampling CHIR
 
 # sampling limits for parameter proposals
 PAR_MIN = 0.001
@@ -72,9 +72,11 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true
 
 
 
-# %% Load ABC results which were saved earlier
 
-# as example: ABC outputs calculated with an N*epsilon value of 55
+#%% 1.2 ########### Obtain Posterior Distributions from ABC output 
+
+# If needed: Load ABC results which were saved earlier. Example: ABC outputs 
+# calculated with an N*epsilon value of 55
 X = np.load('/home/ruske/Desktop/Stem-cell-inference-master/Test55_ModelX.npy')
 Y = np.load('/home/ruske/Desktop/Stem-cell-inference-master/Test55_ModelY.npy')
 
@@ -116,7 +118,7 @@ plt.show()
 
 
 
-# %% ABC rejection sampling EPISC (same structure as CHIR part)
+#%% 2 ########### ABC rejection sampling EPISC
 
 PAR_MIN = 0.001
 PAR_MAX = 1.0
@@ -152,15 +154,11 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4]
 
 [output_parX,output_parY] = EPISC_ABC_simple.get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_MIN, PAR_MAX)
 
-X = np.load('/home/ruske/Desktop/Stem-cell-inference-master/EPISC_Test25_ModelX.npy')
-Y = np.load('/home/ruske/Desktop/Stem-cell-inference-master/EPISC_Test25_ModelY.npy')
 
 
 
 
-
-
-# %% ABC rejection sampling: Compare CHIR/EPISC
+#%% 3 ########### Compare CHIR/EPISC Posteriors
 
 from scipy.integrate import simps
 x = np.logspace(-3,1,500)
@@ -221,6 +219,5 @@ ax.set_xticks([r + barWidth for r in range(len(bars1))])
 ax.set_xticklabels(par_name)
 ax.set_ylabel('Rate [1/day]')
 plt.legend()
-
 
 
