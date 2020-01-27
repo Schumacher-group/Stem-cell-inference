@@ -220,6 +220,3 @@ ax.set_xticks([r + barWidth for r in range(len(bars1))])
 ax.set_xticklabels(par_name)
 ax.set_ylabel('Rate [1/day]')
 plt.legend()
-
-
-
