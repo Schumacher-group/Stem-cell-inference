@@ -64,7 +64,7 @@ Tp_TF = pd.read_excel(xls, 'CHIR-Tm-TS-D3')
 pop1 = Tp_TF.values
 stat_true8 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
 
-# combine data-sets
+# combine data-setsY
 stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true6,stat_true7,stat_true8]
 
 # execute inference (epsilon values and/or summary statistics can be changed in the EPISC_ABC_simple script)
@@ -76,7 +76,7 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true
 #%% 1.2 ########### Obtain Posterior Distributions from ABC output 
 
 # If needed: Load ABC results which were saved earlier. Example: ABC outputs 
-# calculated with an N*epsilon value of 55
+# calculated with an N*epsilon value of 55 for CHIR dataset
 X = np.load('/home/ruske/Desktop/Stem-cell-inference-master/Test55_ModelX.npy')
 Y = np.load('/home/ruske/Desktop/Stem-cell-inference-master/Test55_ModelY.npy')
 
@@ -163,6 +163,7 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4]
 from scipy.integrate import simps
 x = np.logspace(-3,1,500)
 
+# Example: Model X ABC outputs with a N*epsilon value of 50 for CHIR dataset
 X = np.load('/home/ruske/Desktop/Stem-cell-inference-master/Test50_ModelX.npy')
 
 
@@ -174,7 +175,7 @@ for idx in range(0,7):
     stat_CHIR[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
        
 
-
+# Example: Model X ABC outputs with a N*epsilon value of 25 for EPISC dataset
 X = np.load('/home/ruske/Desktop/Stem-cell-inference-master/EPISC_Test25_ModelX.npy')
 
 stat_EPISC = np.zeros((7,2))
@@ -219,5 +220,6 @@ ax.set_xticks([r + barWidth for r in range(len(bars1))])
 ax.set_xticklabels(par_name)
 ax.set_ylabel('Rate [1/day]')
 plt.legend()
+
 
 
