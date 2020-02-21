@@ -59,16 +59,16 @@ def trajectory_EPISC_X(par,N_init,T):
     N_pop = N_init.copy()
     rtype = np.zeros(1)
     rtime = np.zeros(1)
-    while True: 
+    while True:
         scale_arr = np.append(N_pop[0:8]*par[0], N_pop[[0,1,1,3,3,2,2,0,4,5,5,7,7,6,6,4,4,0,5,1,7,3,6,2]]*par[[5,6,3,4,6,5,4,3,5,6,3,4,6,5,4,3,2,1,2,1,2,1,2,1]])
         with np.errstate(divide='ignore', invalid='ignore'): # Zum filtern der unendlichen Werte
             times = -np.log(np.random.rand(32))/scale_arr
             times[np.logical_or(np.logical_or(times==np.inf, times==0), np.logical_or(times==-np.inf, np.isnan(times)))] = T+1
-        idx = np.where(times == np.amin(times))[0][0]     
+        idx = np.where(times == np.amin(times))[0][0]
         rtime = np.append(rtime,rtime[-1]+times[idx])
         rtype = np.append(rtype,idx)
         N_pop += S[idx,:]
-        
+
         if rtime[-1]>T or np.max(N_pop)>=15:
             break
     return N_pop
@@ -119,11 +119,11 @@ def trajectory_EPISC_Y(par,N_init,T):
         with np.errstate(divide='ignore', invalid='ignore'): # Zum filtern der unendlichen Werte
             times = -np.log(np.random.rand(32))/scale_arr
             times[np.logical_or(np.logical_or(times==np.inf, times==0), np.logical_or(times==-np.inf, np.isnan(times)))] = T+1
-        idx = np.where(times == np.amin(times))[0][0]     
+        idx = np.where(times == np.amin(times))[0][0]
         rtime = np.append(rtime,rtime[-1]+times[idx])
         rtype = np.append(rtype,idx)
         N_pop += S[idx,:]
-        
+
         if rtime[-1]>T or np.max(N_pop)>=15:
             break
     return N_pop
@@ -156,7 +156,7 @@ def statistics_X(par,T,T_marker,marker_unobs,MC_N):
                                  [0,0,0,0,0,0,0,1]])
         # Linus prior
         pop_init = pop_init_arr[np.random.choice(4, 1, p=[0.26*0.46, 0.26*0.54, 0.74*0.46, 0.74*0.54])[0]]
-        
+
     pop_ls = np.zeros((0,4))
     for i in range(0,MC_N):
         # get population from simulation
@@ -167,9 +167,9 @@ def statistics_X(par,T,T_marker,marker_unobs,MC_N):
 
     stat = [np.mean(pop_ls,axis=0), np.median(pop_ls,axis=0), np.std(pop_ls,axis=0)]
     return stat
-    
-    
-    
+
+
+
 # model Y summary statistics
 def statistics_Y(par,T,T_marker,marker_unobs,MC_N):
     # if only T+ known: iterate through states with pop_init T+F+S+, T+F+S-, T+F-S+, T+F-S-
@@ -203,8 +203,8 @@ def statistics_Y(par,T,T_marker,marker_unobs,MC_N):
 
 
 
-# %% Bayes factor of combined CHIR data 
-    
+# %% Bayes factor of combined CHIR data
+
 
 def stat_diff(stat_sim,stat_true):
     # abs median deviation and sum over individual cell states
@@ -250,7 +250,7 @@ def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_
         if i%10==0: print(i)
         # sample parameters from priors (same for X and Y)
         par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
         # iterate over Model X initial coniditions
         d = np.zeros(3)
         flag=1
@@ -260,7 +260,7 @@ def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_
                 T_marker = T_marker_ls[ic]
                 marker_unobs = marker_unobs_ls[ic]
                 stat_true = stat_true_ls[ic]
-            
+
                 # calculate summary statistics
                 stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
                 d += stat_diff(stat_simX, stat_true)
@@ -269,7 +269,7 @@ def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_
                 #if np.max(stat_diff(stat_simX, stat_true))>=5:
                 if np.sum(d)>45:
                     flag=0
-           
+
         #if np.max(d)<30: # epsilon=55
         if flag==1:
             output_parX = np.vstack([output_parX, par])
@@ -287,7 +287,7 @@ def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_
 
                 # calculate summary statistics
                 stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-                d += stat_diff(stat_simY, stat_true) 
+                d += stat_diff(stat_simY, stat_true)
 # THIS IS THE REJECTION STEP. CAN CHOOSE DIFFERENT SUMMARY STATISTICS.
 # THE CURRENTLY CHOSEN SUMMARY STATISTIC IS THE LINE 'np.sum(d)>45', WHERE EPSILON=45
                 #if np.max(stat_diff(stat_simY, stat_true))>=5:
@@ -297,13 +297,13 @@ def get_ABC_BF_comb(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_
         #if np.max(d)<30: # epsilon=55
         if flag==1:
             output_parY = np.vstack([output_parY, par])
-         
+
         if i%1000==999:
-            np.save('/home/ruske/Desktop/Stem-cell-inference-master/Test45_ModelX',output_parX)
-            np.save('/home/ruske/Desktop/Stem-cell-inference-master/Test45_ModelY',output_parY)
+            np.save('/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/Test45_ModelX',output_parX)
+            np.save('/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/Test45_ModelY',output_parY)
             print('Average acceptance prob for Model X: ', len(output_parX)/N_MC)
-            print('\nAverage acceptance prob for Model Y: ', len(output_parY)/N_MC) 
-  
+            print('\nAverage acceptance prob for Model Y: ', len(output_parY)/N_MC)
+
 
     return [output_parX,output_parY]
 
@@ -320,7 +320,7 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
         if i%10==0: print(i)
         # sample parameters from priors (same for X and Y)
         par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
         # iterate over Model X initial coniditions
         d = np.zeros(3)
         flag=1
@@ -330,7 +330,7 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
                 T_marker = T_marker_ls[ic]
                 marker_unobs = marker_unobs_ls[ic]
                 stat_true = stat_true_ls[ic]
-            
+
                 # calculate summary statistics
                 stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
                 d += stat_diff(stat_simX, stat_true)
@@ -339,7 +339,7 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
                 #if np.max(stat_diff(stat_simX, stat_true))>=5:
                 if np.sum(d)>40:
                     flag=0
-           
+
         #if np.max(d)<30: # epsilon=55
         if flag==1:
             output_parX = np.vstack([output_parX, par])
@@ -357,7 +357,7 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
 
                 # calculate summary statistics
                 stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-                d += stat_diff(stat_simY, stat_true) 
+                d += stat_diff(stat_simY, stat_true)
 # THIS IS THE REJECTION STEP. CAN CHOOSE DIFFERENT SUMMARY STATISTICS.
 # THE CURRENTLY CHOSEN SUMMARY STATISTIC IS THE LINE 'np.sum(d)>45', WHERE EPSILON=45
                 #if np.max(stat_diff(stat_simY, stat_true))>=5:
@@ -367,13 +367,13 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
         #if np.max(d)<30: # epsilon=55
         if flag==1:
             output_parY = np.vstack([output_parY, par])
-         
+
         if i%1000==999:
-            np.save('/home/ruske/Desktop/Stem-cell-inference-master/EPISC_Test40_ModelX',output_parX)
-            np.save('/home/ruske/Desktop/Stem-cell-inference-master/EPISC_Test40_ModelY',output_parY)
+            np.save('/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/EPISC_Test40_ModelX',output_parX)
+            np.save('/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/EPISC_Test40_ModelY',output_parY)
             print('Average acceptance prob for Model X: ', len(output_parX)/N_MC)
-            print('\nAverage acceptance prob for Model Y: ', len(output_parY)/N_MC) 
-  
+            print('\nAverage acceptance prob for Model Y: ', len(output_parY)/N_MC)
+
 
     return [output_parX,output_parY]
 
@@ -394,23 +394,23 @@ def get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC
 # functions for parallel computing (need to be used with multiprocessing python library)
 #
 # EXAMPLE:
-#    
+#
 # from joblib import Parallel, delayed
 # from tqdm import tqdm
-
+#
 # N_MC = 100
 # num_cores = 8
 # eps = 400
 #
 # results = np.stack(Parallel(n_jobs=num_cores)(delayed(EPISC_ABC_simple.get_ABC_BF_comb_paralx)(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps) for i in tqdm(range(N_MC),position=0, leave=True) ))
 # X = results[results[:,0]!=0,:]
-# np.save('/home/ruske/Desktop/Stem-cell-inference-master/diff_norm2/EPISC_Test67_ModelX',X)
+# np.save('/home/ruske/Desktop/Stem-cell-inference-master/diff_norm2/EPISC_Test_nmc100_nc8_eps400_ModelX',X)
 
 
 def get_ABC_BF_comb_paralx(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps):
 
     par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
     # iterate over Model X initial coniditions
     d = np.zeros(3)
     flagx=1
@@ -420,7 +420,7 @@ def get_ABC_BF_comb_paralx(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
             T_marker = T_marker_ls[ic]
             marker_unobs = marker_unobs_ls[ic]
             stat_true = stat_true_ls[ic]
-            
+
             # calculate summary statistics
             stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
             d += stat_diff2(stat_simX, stat_true)
@@ -428,7 +428,7 @@ def get_ABC_BF_comb_paralx(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
             #if stat_decide4(stat_simX,stat_true,0)==False:
             if np.sum(d)>eps:
                 flagx=0
-           
+
     #if np.max(d)<30: # epsilon=55
     if flagx==1:
         return par
@@ -439,7 +439,7 @@ def get_ABC_BF_comb_paralx(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
 def get_ABC_BF_comb_paraly(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps):
 
     par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
     # iterate over Model Y initial coniditions
     d = np.zeros(3)
     flagy=1
@@ -452,7 +452,7 @@ def get_ABC_BF_comb_paraly(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
 
             # calculate summary statistics
             stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simY, stat_true) 
+            d += stat_diff2(stat_simY, stat_true)
             #if np.max(stat_diff(stat_simY, stat_true))>=5:
             #if stat_decide4(stat_simY,stat_true,0)==False:
             if np.sum(d)>eps:
@@ -463,14 +463,14 @@ def get_ABC_BF_comb_paraly(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
         return par
     else:
         return np.zeros(7)
-    
-    
-    
-    
+
+
+
+
 def get_ABC_BF_comb_paralx_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps):
 
     par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
     # iterate over Model X initial coniditions
     d = np.zeros(3)
     flagx=1
@@ -480,7 +480,7 @@ def get_ABC_BF_comb_paralx_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
             T_marker = T_marker_ls[ic]
             marker_unobs = marker_unobs_ls[ic]
             stat_true = stat_true_ls[ic]
-            
+
             # calculate summary statistics
             stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
             d += stat_diff2(stat_simX, stat_true)
@@ -488,7 +488,7 @@ def get_ABC_BF_comb_paralx_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
             #if stat_decide4(stat_simX,stat_true,0)==False:
             if np.sum(d)>eps:
                 flagx=0
-           
+
     #if np.max(d)<30: # epsilon=55
     if flagx==1:
         return par
@@ -499,7 +499,7 @@ def get_ABC_BF_comb_paralx_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
 def get_ABC_BF_comb_paraly_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps):
 
     par = loguniform(PAR_MIN,PAR_MAX,7)
-        
+
     # iterate over Model Y initial coniditions
     d = np.zeros(3)
     flagy=1
@@ -512,7 +512,7 @@ def get_ABC_BF_comb_paraly_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
 
             # calculate summary statistics
             stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simY, stat_true) 
+            d += stat_diff2(stat_simY, stat_true)
             #if np.max(stat_diff(stat_simY, stat_true))>=5:
             #if stat_decide4(stat_simY,stat_true,0)==False:
             if np.sum(d)>eps:
