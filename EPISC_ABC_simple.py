@@ -423,7 +423,7 @@ def get_ABC_BF_comb_paralx(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
 
             # calculate summary statistics
             stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simX, stat_true)
+            d += stat_diff(stat_simX, stat_true)
             #if np.max(stat_diff(stat_simX, stat_true))>=5:
             #if stat_decide4(stat_simX,stat_true,0)==False:
             if np.sum(d)>eps:
@@ -452,7 +452,7 @@ def get_ABC_BF_comb_paraly(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR
 
             # calculate summary statistics
             stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simY, stat_true)
+            d += stat_diff(stat_simY, stat_true)
             #if np.max(stat_diff(stat_simY, stat_true))>=5:
             #if stat_decide4(stat_simY,stat_true,0)==False:
             if np.sum(d)>eps:
@@ -483,7 +483,7 @@ def get_ABC_BF_comb_paralx_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
 
             # calculate summary statistics
             stat_simX = statistics_X(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simX, stat_true)
+            d += stat_diff(stat_simX, stat_true)
             #if np.max(stat_diff(stat_simX, stat_true))>=5:
             #if stat_decide4(stat_simX,stat_true,0)==False:
             if np.sum(d)>eps:
@@ -512,7 +512,7 @@ def get_ABC_BF_comb_paraly_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_l
 
             # calculate summary statistics
             stat_simY = statistics_Y(par,T,T_marker,marker_unobs,200)
-            d += stat_diff2(stat_simY, stat_true)
+            d += stat_diff(stat_simY, stat_true)
             #if np.max(stat_diff(stat_simY, stat_true))>=5:
             #if stat_decide4(stat_simY,stat_true,0)==False:
             if np.sum(d)>eps:
