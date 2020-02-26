@@ -81,9 +81,9 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-N_MC = 2000000
+N_MC = 4000000
 num_cores = 16
-eps1 = 46
+eps1 = 40
 
 results = np.stack(Parallel(n_jobs=num_cores)(delayed(EPISC_ABC_simple.get_ABC_BF_comb_paralx)(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps1) for i in tqdm(range(N_MC),position=0, leave=True) ))
 X = results[results[:,0]!=0,:]
@@ -142,7 +142,7 @@ plt.savefig('modelYparampostisCHIR.pdf')
 
 PAR_MIN = 0.001
 PAR_MAX = 1.0
-N_MC = 2000000
+N_MC = 4000000
 
 T_ls = [3,3,3,3]
 marker_unobs_ls = ['S','F','S','F']
@@ -175,7 +175,7 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4]
 # [output_parX,output_parY] = EPISC_ABC_simple.get_ABC_BF_comb_EPISC(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, N_MC, PAR_MIN, PAR_MAX)
 
 # functions for parallel computing (need to be used with multiprocessing python library)
-eps2 = 23
+eps2 = 20
 
 results = np.stack(Parallel(n_jobs=num_cores)(delayed(EPISC_ABC_simple.get_ABC_BF_comb_paralx_EPISC)(stat_true_ls, T_ls, T_marker_ls, marker_unobs_ls, PAR_MIN, PAR_MAX, eps2) for i in tqdm(range(N_MC),position=0, leave=True) ))
 X = results[results[:,0]!=0,:]
