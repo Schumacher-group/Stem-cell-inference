@@ -25,7 +25,7 @@ def prior_U(par):
 #%% 1.1 ########### ABC rejection sampling CHIR
 
 # sampling limits for parameter proposals
-PAR_MIN = 0.001
+PAR_MIN = 0.01
 PAR_MAX = 1.0
 N_MC = 100
 
@@ -81,7 +81,7 @@ stat_true_ls = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-N_MC = 4000000
+N_MC = 2000000
 num_cores = 16
 eps1 = 40
 
@@ -140,9 +140,9 @@ plt.savefig('modelYparampostisCHIR.pdf')
 
 #%% 2 ########### ABC rejection sampling EPISC
 
-PAR_MIN = 0.001
+PAR_MIN = 0.01
 PAR_MAX = 1.0
-N_MC = 4000000
+N_MC = 2000000
 
 T_ls = [3,3,3,3]
 marker_unobs_ls = ['S','F','S','F']
