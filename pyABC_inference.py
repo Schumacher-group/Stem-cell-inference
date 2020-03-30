@@ -2,13 +2,15 @@
 import pyabc
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
 
 # Local path of data folder and output folder
-PATH_DAT = 'C:/.../Stem-cell-inference-master/inference'
-PATH_OUT = 'C:/.../Stem-cell-inference-master/pyabc'
+PATH_DAT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
 
 # bounds of log-uniform priors
 PAR_MIN = 0.01
@@ -269,32 +271,34 @@ def distance(x, y):
     return eps
 
 
-# Option 1 Set up ABC-SMC parameter inference for single model
-abc = pyabc.ABCSMC(model_C, par_prior, distance)
-db_path = ("sqlite:///"+PATH_OUT+"/test.db")
-abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-history = abc.run(minimum_epsilon=20, max_nr_populations=20)
+# # Option 1 Set up ABC-SMC parameter inference for single model
+# abc = pyabc.ABCSMC(model_C, par_prior, distance)
+# db_path = ("sqlite:///"+PATH_OUT+"/test.db")
+# abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
+# history = abc.run(minimum_epsilon=20, max_nr_populations=20)
 
 # Option 2 Set up ABC-SMC inference for model comparison
-abc = pyabc.ABCSMC(models, priors, distance)
+abc = pyabc.ABCSMC(models, priors, distance,population_size=1000,
+                    transitions=[pyabc.transition.LocalTransition(k_fraction=0.25),
+                                pyabc.transition.LocalTransition(k_fraction=0.25)])
 db_path = ("sqlite:///"+PATH_OUT+"/test.db")
 abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-history = abc.run(minimum_epsilon=0.1, max_nr_populations=10)
+history = abc.run(minimum_epsilon=0.1, max_nr_populations=20)
 
-# Option 3 Load or resuming stored ABC run
-abc_continued = pyabc.ABCSMC(model_C, par_prior, distance)
-db_path = ("sqlite:///"+PATH_OUT+"/test.db")
-abc_continued.load(db_path, 1) # second argument is ID which is assigned to SMC run (ID is generated at first execution)
-history = abc_continued.run(minimum_epsilon=10, max_nr_populations=10)
+# # Option 3 Load or resuming stored ABC run
+# abc_continued = pyabc.ABCSMC(model_C, par_prior, distance)
+# db_path = ("sqlite:///"+PATH_OUT+"/test.db")
+# abc_continued.load(db_path, 1) # second argument is ID which is assigned to SMC run (ID is generated at first execution)
+# history = abc_continued.run(minimum_epsilon=10, max_nr_populations=10)
 
 
 # Visualise model comparison
 pyabc.visualization.plot_model_probabilities(history)
-plt.show()
+plt.savefig("model_comparison.pdf")
 
 
 # Visualise posteriors via KDE of sampled parameters
-df, w = abc_continued.history.get_distribution(m=0) # m is Model index (0=C, 1=U), optional: t= SMC population index
+df, w = abc.history.get_distribution(m=0) # m is Model index (0=C, 1=U), optional: t= SMC population index
 x = np.logspace(-2,0,500)
 fig = plt.figure(figsize=(10,5))
 ax = plt.subplot(111)
@@ -310,6 +314,4 @@ plt.xlim(-2,0.0)
 plt.xlabel(r'$log_{10}$ reaction rate [1/d]')
 plt.ylabel(r'$p(\theta)$')
 ax.legend()
-plt.show()
-
-
+plt.savefig("posteriors.pdf")
