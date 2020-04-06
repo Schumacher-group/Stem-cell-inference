@@ -278,20 +278,20 @@ def distance(x, y):
 # abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
 # history = abc.run(minimum_epsilon=20, max_nr_populations=20)
 
-# # Option 2 Set up ABC-SMC inference for model comparison
-# abc = pyabc.ABCSMC(models, priors, distance,population_size=10000,
-#                     transitions=[pyabc.transition.LocalTransition(k_fraction=0.25),
-#                                 pyabc.transition.LocalTransition(k_fraction=0.25)])
-# db_path = ("sqlite:///"+PATH_OUT+"/test.db")
-# abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-# history = abc.run(minimum_epsilon=0.1, max_nr_populations=25)
-
-# Option 3 Load or resuming stored ABC run
-abc_continued = pyabc.ABCSMC(model_C, par_prior, distance)
+# Option 2 Set up ABC-SMC inference for model comparison
+abc = pyabc.ABCSMC(models, priors,distance,population_size=10000,
+                    transitions=[pyabc.transition.LocalTransition(k_fraction=0.25),
+                                pyabc.transition.LocalTransition(k_fraction=0.25)])
 db_path = ("sqlite:///"+PATH_OUT+"/test.db")
-abc_continued.load(db_path, 1) # second argument is ID which is assigned to SMC run (ID is generated at first execution)
-history = abc_continued.history
-# history = abc_continued.run(minimum_epsilon=10, max_nr_populations=10)
+abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
+history = abc.run(minimum_epsilon=0.1, max_nr_populations=25)
+
+# # Option 3 Load or resuming stored ABC run
+# abc_continued = pyabc.ABCSMC(model_C, par_prior, distance)
+# db_path = ("sqlite:///"+PATH_OUT+"/test.db")
+# abc_continued.load(db_path, 1) # second argument is ID which is assigned to SMC run (ID is generated at first execution)
+# history = abc_continued.history
+# # history = abc_continued.run(minimum_epsilon=10, max_nr_populations=10)
 
 
 # Visualise model comparison

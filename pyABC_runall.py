@@ -2,13 +2,19 @@
 import pyabc
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
 
 # Local path of data folder and output folder
-PATH_DAT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/inference'
-PATH_OUT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/pyabc'
+PATH_DAT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
+# PATH_DAT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+# PATH_OUT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
+# PATH_DAT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/inference'
+# PATH_OUT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/pyabc'
 
 # bounds of log-uniform priors
 PAR_MIN = 0.01
@@ -16,7 +22,8 @@ PAR_MAX = 1.0
 
 # SMC-ABC population size
 POP_SIZE = 10000
-
+transition_kernels = [pyabc.transition.LocalTransition(k_fraction=0.25),
+            pyabc.transition.LocalTransition(k_fraction=0.25)]
 #################################  Model definitions  #################################
 
 # model C definition
@@ -307,7 +314,8 @@ T_marker_ls = [1,1,0,0,1,1,0,0]
 observations = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true6,stat_true7,stat_true8]
 
 # Set up ABC-SMC inference for model comparison
-abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE)
+abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
+                    transitions=transition_kernels)
 db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined.db")
 abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3],"data5": observations[4],"data6": observations[5],"data7": observations[6],"data8": observations[7]})
 history = abc.run(minimum_epsilon=10, max_nr_populations=20)
@@ -322,7 +330,8 @@ T_marker_ls = [1,1,0,0] # flag that initial conditions should be sampled from ex
 observations = [stat_true1,stat_true2,stat_true3,stat_true4]
 
 # Set up ABC-SMC inference for model comparison
-abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE)
+abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
+                    transitions=transition_kernels)
 db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D2.db")
 abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
 history = abc.run(minimum_epsilon=5, max_nr_populations=20)
@@ -337,7 +346,8 @@ T_marker_ls = [21,21,20,20] # flag that initial conditions should be sampled fro
 observations = [stat_true5,stat_true6,stat_true7,stat_true8]
 
 # Set up ABC-SMC inference for model comparison
-abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE)
+abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
+                    transitions=transition_kernels)
 db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D3.db")
 abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
 history = abc.run(minimum_epsilon=5, max_nr_populations=20)
