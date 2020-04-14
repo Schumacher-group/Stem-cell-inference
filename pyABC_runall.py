@@ -377,235 +377,242 @@ df_EP, w_EP = abc_continued.history.get_distribution(m=0)
 pyabc.visualization.plot_model_probabilities(abc_continued.history)
 plt.savefig("model_comparison_EPISC.pdf")
 
-# # load existing CHIR D2 run
-# abc_continued = pyabc.ABCSMC(models, priors, distance)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D2.db")
-# abc_continued.load(db_path, 1)
-# df_CH2, w_CH2 = abc_continued.history.get_distribution(m=0)
-#
-# # load existing CHIR D3 run
-# abc_continued = pyabc.ABCSMC(models, priors, distance)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D3.db")
-# abc_continued.load(db_path, 1)
-# df_CH3, w_CH3 = abc_continued.history.get_distribution(m=0)
+# load existing CHIR D2 run
+abc_continued = pyabc.ABCSMC(models, priors, distance)
+db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D2.db")
+abc_continued.load(db_path, 1)
+df_CH2, w_CH2 = abc_continued.history.get_distribution(m=0)
+# Visualise model comparison
+pyabc.visualization.plot_model_probabilities(abc_continued.history)
+plt.savefig("model_comparison_CHIR_D2.pdf")
+
+# load existing CHIR D3 run
+abc_continued = pyabc.ABCSMC(models, priors, distance)
+db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D3.db")
+abc_continued.load(db_path, 1)
+df_CH3, w_CH3 = abc_continued.history.get_distribution(m=0)
+# Visualise model comparison
+pyabc.visualization.plot_model_probabilities(abc_continued.history)
+plt.savefig("model_comparison_CHIR_D3.pdf")
 
 
 
+# Compare posterior means of CHIR/EPISC
+import matplotlib
+matplotlib.rcParams.update({'font.size': 16})
+from scipy.integrate import simps
+x = np.logspace(-2,0,1000)
+stat_CHIR = np.zeros((7,2))
+for idx in range(0,7):
+    k1 = gaussian_kde(np.log10(df_CH.values[:,idx]),weights=w_CH)
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_CHIR[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                         simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
+stat_EPISC = np.zeros((7,2))
+for idx in range(0,7):
+    k1 = gaussian_kde(np.log10(df_EP.values[:,idx]),weights=w_EP)
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_EPISC[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
 
-# # Compare posterior means of CHIR/EPISC
-# import matplotlib
-# matplotlib.rcParams.update({'font.size': 16})
-# from scipy.integrate import simps
-# x = np.logspace(-2,0,1000)
-# stat_CHIR = np.zeros((7,2))
-# for idx in range(0,7):
-#     k1 = gaussian_kde(np.log10(df_CH.values[:,idx]),weights=w_CH)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_CHIR[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-# stat_EPISC = np.zeros((7,2))
-# for idx in range(0,7):
-#     k1 = gaussian_kde(np.log10(df_EP.values[:,idx]),weights=w_EP)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_EPISC[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
-#
-# # width of the bars
-# barWidth = 0.3
-# # Choose the height of bars
-# bars1 = 10**stat_CHIR[:,0]
-# bars2 = 10**stat_EPISC[:,0]
-# # Choose the height of the error bars (use std deviation)
-# yer1 = [10**(stat_CHIR[:,0]-np.sqrt(stat_CHIR[:,1])), 10**(stat_CHIR[:,0]+np.sqrt(stat_CHIR[:,1]))]
-# yer2 = [10**(stat_EPISC[:,0]-np.sqrt(stat_EPISC[:,1])), 10**(stat_EPISC[:,0]+np.sqrt(stat_EPISC[:,1]))]
-# # The x position of bars
-# r1 = np.arange(len(bars1))
-# r2 = [x + barWidth for x in r1]
-# # Create bars
-# fig = plt.figure(figsize=(10,5))
-# ax = plt.subplot(111)
-# ax.bar(r1, bars1, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR')
-# ax.bar(r2, bars2, width = barWidth, color = 'orange', edgecolor = 'black', capsize=7, label='EPISC')
-# ax.vlines(r1, yer1[0], yer1[1])
-# ax.vlines(r2, yer2[0], yer2[1])
-# # general layout
-# ax.set_yscale('log')
-# ax.set_ylim(0.01,1.1)
-# par_name = [r'$\theta_{0}$',r'$\theta_{T-}$',r'$\theta_{T+}$',r'$\theta_{S-}$',r'$\theta_{S+}$',r'$\theta_{F-}$',r'$\theta_{F+}$']
-# ax.set_xticks([r + barWidth for r in range(len(bars1))])
-# ax.set_xticklabels(par_name)
-# ax.set_ylabel('Rate [1/day]')
-# plt.legend()
-# # plt.show()
-# plt.savefig('posterior_means.pdf')
-#
-#
-#
-# # Compare posterior rate imbalance of CHIR/EPISC
-# x = np.logspace(-3,3,1000)
-# stat_CHIR = np.zeros((3, 2))
-# for idx in range(0, 3):
-#     k1 = gaussian_kde(np.log10(df_CH.values[:, 2 * idx + 2] / df_CH.values[:, 2 * idx + 1]),weights=w_CH)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_CHIR[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-# stat_EPISC = np.zeros((3, 2))
-# for idx in range(0, 3):
-#     k1 = gaussian_kde(np.log10(df_EP.values[:, 2 * idx + 2] / df_EP.values[:, 2 * idx + 1]),weights=w_EP)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_EPISC[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                           simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-#
-# # width of the bars
-# barWidth = 0.2
-# # Choose the height of bars
-# bars1 = 10 ** stat_CHIR[:, 0]
-# bars2 = 10 ** stat_EPISC[:, 0]
-# # Choose the height of the error bars (use std deviation)
-# yer1 = [10 ** (stat_CHIR[:, 0] - np.sqrt(stat_CHIR[:, 1])), 10 ** (stat_CHIR[:, 0] + np.sqrt(stat_CHIR[:, 1]))]
-# yer2 = [10 ** (stat_EPISC[:, 0] - np.sqrt(stat_EPISC[:, 1])), 10 ** (stat_EPISC[:, 0] + np.sqrt(stat_EPISC[:, 1]))]
-# # The x position of bars
-# r1 = np.arange(len(bars1))
-# r2 = [x + barWidth for x in r1]
-# # Create bars
-# fig = plt.figure(figsize=(10, 5))
-# ax = plt.subplot(111)
-# ax.bar(r1, bars1, width=barWidth, color='lightblue', edgecolor='black', capsize=7, label='CHIR')
-# ax.bar(r2, bars2, width=barWidth, color='orange', edgecolor='black', capsize=7, label='EPISC')
-# ax.hlines(1, -1, 3, linestyles='dashed')
-# ax.vlines(r1, yer1[0], yer1[1])
-# ax.vlines(r2, yer2[0], yer2[1])
-# # general layout
-# # ax.set_ylim(0,2.8)
-# ax.set_xlim(-0.3, 2.7)
-# ax.set_yscale('log')
-# par_name = [r'$\theta_{T+}/\theta_{T-}$', r'$\theta_{S+}/\theta_{S-}$', r'$\theta_{F+}/\theta_{F-}$']
-# ax.set_xticks([r + barWidth for r in range(len(bars1))])
-# ax.set_xticklabels(par_name)
-# ax.set_ylabel(r'Rate imbalance')
-# plt.legend()
-# # plt.show()
-# plt.savefig('rate_imbalance.pdf')
-
-
-
-
-# # Compare posterior means of CHIR D2 and CHIR D3
-# x = np.logspace(-2,0,500)
-# stat_CHIR2 = np.zeros((7,2))
-# for idx in range(0,7):
-#     k1 = gaussian_kde(np.log10(df_CH2.values[:,idx]),weights=w_CH2)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf/simps(pdf,dx=0.0001)
-#     stat_CHIR2[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
-# stat_CHIR3 = np.zeros((7,2))
-# for idx in range(0,7):
-#     k1 = gaussian_kde(np.log10(df_CH3.values[:,idx]),weights=w_CH3)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf/simps(pdf,dx=0.0001)
-#     stat_CHIR3[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
-# stat_CHIR23 = np.zeros((7,2))
-# for idx in range(0,7):
-#     k1 = gaussian_kde(np.log10(df_CH.values[:,idx]),weights=w_CH)
-#     pdf = k1(np.log10(x))
-#     pdf = pdf/simps(pdf,dx=0.0001)
-#     stat_CHIR23[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
-#
-# # width of the bars
-# barWidth = 0.2
-# # Choose the height of bars
-# bars1 = 10**stat_CHIR2[:,0]
-# bars2 = 10**stat_CHIR3[:,0]
-# bars3 = 10**stat_CHIR23[:,0]
-# # Choose the height of the error bars (use std deviation)
-# yer1 = [10**(stat_CHIR2[:,0]-np.sqrt(stat_CHIR2[:,1])), 10**(stat_CHIR2[:,0]+np.sqrt(stat_CHIR2[:,1]))]
-# yer2 = [10**(stat_CHIR3[:,0]-np.sqrt(stat_CHIR3[:,1])), 10**(stat_CHIR3[:,0]+np.sqrt(stat_CHIR3[:,1]))]
-# yer3 = [10**(stat_CHIR23[:,0]-np.sqrt(stat_CHIR23[:,1])), 10**(stat_CHIR23[:,0]+np.sqrt(stat_CHIR23[:,1]))]
-# # The x position of bars
-# r1 = np.arange(len(bars1))
-# r2 = [x + barWidth for x in r1]
-# r3 = [x + barWidth for x in r2]
-# # Create bars
-# fig = plt.figure(figsize=(10,5),dpi=200)
-# matplotlib.rcParams.update({'font.size': 16})
-# ax = plt.subplot(111)
-# ax.bar(r1, bars1, width = barWidth, color = 'navy', edgecolor = 'black', capsize=7, label='CHIR D2')
-# ax.bar(r2, bars3, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR D2+D3')
-# ax.bar(r3, bars2, width = barWidth, color = 'azure', edgecolor = 'black', capsize=7, label='CHIR D3')
-# ax.vlines(r1, yer1[0], yer1[1])
-# ax.vlines(r3, yer2[0], yer2[1])
-# ax.vlines(r2, yer3[0], yer3[1])
-# # general layout
-# ax.set_yscale('log')
-# ax.set_ylim(0.01,1)
-# par_name = [r'$\theta_{0}$',r'$\theta_{T-}$',r'$\theta_{T+}$',r'$\theta_{S-}$',r'$\theta_{S+}$',r'$\theta_{F-}$',r'$\theta_{F+}$']
-# ax.set_xticks([r + barWidth for r in range(len(bars1))])
-# ax.set_xticklabels(par_name)
-# ax.set_ylabel('Rate [1/day]')
-# plt.legend()
+# width of the bars
+barWidth = 0.3
+# Choose the height of bars
+bars1 = 10**stat_CHIR[:,0]
+bars2 = 10**stat_EPISC[:,0]
+# Choose the height of the error bars (use std deviation)
+yer1 = [10**(stat_CHIR[:,0]-np.sqrt(stat_CHIR[:,1])), 10**(stat_CHIR[:,0]+np.sqrt(stat_CHIR[:,1]))]
+yer2 = [10**(stat_EPISC[:,0]-np.sqrt(stat_EPISC[:,1])), 10**(stat_EPISC[:,0]+np.sqrt(stat_EPISC[:,1]))]
+# The x position of bars
+r1 = np.arange(len(bars1))
+r2 = [x + barWidth for x in r1]
+# Create bars
+fig = plt.figure(figsize=(10,5))
+ax = plt.subplot(111)
+ax.bar(r1, bars1, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR')
+ax.bar(r2, bars2, width = barWidth, color = 'orange', edgecolor = 'black', capsize=7, label='EPISC')
+ax.vlines(r1, yer1[0], yer1[1])
+ax.vlines(r2, yer2[0], yer2[1])
+# general layout
+ax.set_yscale('log')
+ax.set_ylim(0.01,1.1)
+par_name = [r'$\theta_{0}$',r'$\theta_{T-}$',r'$\theta_{T+}$',r'$\theta_{S-}$',r'$\theta_{S+}$',r'$\theta_{F-}$',r'$\theta_{F+}$']
+ax.set_xticks([r + barWidth for r in range(len(bars1))])
+ax.set_xticklabels(par_name)
+ax.set_ylabel('Rate [1/day]')
+plt.legend()
 # plt.show()
+plt.savefig('posterior_means.pdf')
 
 
 
+# Compare posterior rate imbalance of CHIR/EPISC
+x = np.logspace(-3,3,1000)
+stat_CHIR = np.zeros((3, 2))
+for idx in range(0, 3):
+    k1 = gaussian_kde(np.log10(df_CH.values[:, 2 * idx + 2] / df_CH.values[:, 2 * idx + 1]),weights=w_CH)
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_CHIR[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                         simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
+stat_EPISC = np.zeros((3, 2))
+for idx in range(0, 3):
+    k1 = gaussian_kde(np.log10(df_EP.values[:, 2 * idx + 2] / df_EP.values[:, 2 * idx + 1]),weights=w_EP)
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_EPISC[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
 
-# # Compare posterior rate imbalance of CHIR D2 and CHIR D3
-# x = np.logspace(-3,3,1000)
-# stat_CHIR2 = np.zeros((3, 2))
-# for idx in range(0, 3):
-#     k1 = gaussian_kde(np.log10(df_CH2.values[:, 2*idx+2]/df_CH2.values[:, 2*idx+1]))
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_CHIR2[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                           simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-# stat_CHIR3 = np.zeros((3, 2))
-# for idx in range(0, 3):
-#     k1 = gaussian_kde(np.log10(df_CH3.values[:, 2*idx+2]/df_CH3.values[:, 2*idx+1]))
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_CHIR3[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                           simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-# stat_CHIR23 = np.zeros((3, 2))
-# for idx in range(0, 3):
-#     k1 = gaussian_kde(np.log10(df_CH.values[:, 2*idx+2]/df_CH.values[:, 2*idx+1]))
-#     pdf = k1(np.log10(x))
-#     pdf = pdf / simps(pdf, dx=0.0001)
-#     stat_CHIR23[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
-#                           simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
-
-# # width of the bars
-# barWidth = 0.2
-# # Choose the height of bars
-# bars1 = 10**stat_CHIR2[:,0]
-# bars2 = 10**stat_CHIR3[:,0]
-# bars3 = 10**stat_CHIR23[:,0]
-# # Choose the height of the error bars (use std deviation)
-# yer1 = [10**(stat_CHIR2[:,0]-np.sqrt(stat_CHIR2[:,1])), 10**(stat_CHIR2[:,0]+np.sqrt(stat_CHIR2[:,1]))]
-# yer2 = [10**(stat_CHIR3[:,0]-np.sqrt(stat_CHIR3[:,1])), 10**(stat_CHIR3[:,0]+np.sqrt(stat_CHIR3[:,1]))]
-# yer3 = [10**(stat_CHIR23[:,0]-np.sqrt(stat_CHIR23[:,1])), 10**(stat_CHIR23[:,0]+np.sqrt(stat_CHIR23[:,1]))]
-# # The x position of bars
-# r1 = np.arange(len(bars1))
-# r2 = [x + barWidth for x in r1]
-# r3 = [x + barWidth for x in r2]
-# # Create bars
-# fig = plt.figure(figsize=(10,5),dpi=200)
-# matplotlib.rcParams.update({'font.size': 16})
-# ax = plt.subplot(111)
-# ax.bar(r1, bars1, width = barWidth, color = 'navy', edgecolor = 'black', capsize=7, label='CHIR D2')
-# ax.bar(r2, bars3, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR D2+D3')
-# ax.bar(r3, bars2, width = barWidth, color = 'azure', edgecolor = 'black', capsize=7, label='CHIR D3')
-# ax.vlines(r1, yer1[0], yer1[1])
-# ax.vlines(r3, yer2[0], yer2[1])
-# ax.vlines(r2, yer3[0], yer3[1])
-# # general layout
-# ax.hlines(1,-1,3,linestyles='dashed')
-# ax.set_xlim(-0.3,2.7)
-# ax.set_yscale('log')
-# par_name = [r'$\theta_{T+}/\theta_{T-}$',r'$\theta_{S+}/\theta_{S-}$',r'$\theta_{F+}/\theta_{F-}$']
-# ax.set_xticks([r + barWidth for r in range(len(bars1))])
-# ax.set_xticklabels(par_name)
-# ax.set_ylabel(r'Rate imbalance')
-# plt.legend()
+# width of the bars
+barWidth = 0.2
+# Choose the height of bars
+bars1 = 10 ** stat_CHIR[:, 0]
+bars2 = 10 ** stat_EPISC[:, 0]
+# Choose the height of the error bars (use std deviation)
+yer1 = [10 ** (stat_CHIR[:, 0] - np.sqrt(stat_CHIR[:, 1])), 10 ** (stat_CHIR[:, 0] + np.sqrt(stat_CHIR[:, 1]))]
+yer2 = [10 ** (stat_EPISC[:, 0] - np.sqrt(stat_EPISC[:, 1])), 10 ** (stat_EPISC[:, 0] + np.sqrt(stat_EPISC[:, 1]))]
+# The x position of bars
+r1 = np.arange(len(bars1))
+r2 = [x + barWidth for x in r1]
+# Create bars
+fig = plt.figure(figsize=(10, 5))
+ax = plt.subplot(111)
+ax.bar(r1, bars1, width=barWidth, color='lightblue', edgecolor='black', capsize=7, label='CHIR')
+ax.bar(r2, bars2, width=barWidth, color='orange', edgecolor='black', capsize=7, label='EPISC')
+ax.hlines(1, -1, 3, linestyles='dashed')
+ax.vlines(r1, yer1[0], yer1[1])
+ax.vlines(r2, yer2[0], yer2[1])
+# general layout
+# ax.set_ylim(0,2.8)
+ax.set_xlim(-0.3, 2.7)
+ax.set_yscale('log')
+par_name = [r'$\theta_{T+}/\theta_{T-}$', r'$\theta_{S+}/\theta_{S-}$', r'$\theta_{F+}/\theta_{F-}$']
+ax.set_xticks([r + barWidth for r in range(len(bars1))])
+ax.set_xticklabels(par_name)
+ax.set_ylabel(r'Rate imbalance')
+plt.legend()
 # plt.show()
+plt.savefig('rate_imbalance.pdf')
+
+
+
+
+# Compare posterior means of CHIR D2 and CHIR D3
+x = np.logspace(-2,0,500)
+stat_CHIR2 = np.zeros((7,2))
+for idx in range(0,7):
+    k1 = gaussian_kde(np.log10(df_CH2.values[:,idx]),weights=w_CH2)
+    pdf = k1(np.log10(x))
+    pdf = pdf/simps(pdf,dx=0.0001)
+    stat_CHIR2[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
+stat_CHIR3 = np.zeros((7,2))
+for idx in range(0,7):
+    k1 = gaussian_kde(np.log10(df_CH3.values[:,idx]),weights=w_CH3)
+    pdf = k1(np.log10(x))
+    pdf = pdf/simps(pdf,dx=0.0001)
+    stat_CHIR3[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
+stat_CHIR23 = np.zeros((7,2))
+for idx in range(0,7):
+    k1 = gaussian_kde(np.log10(df_CH.values[:,idx]),weights=w_CH)
+    pdf = k1(np.log10(x))
+    pdf = pdf/simps(pdf,dx=0.0001)
+    stat_CHIR23[idx,:] = [simps(np.log10(x)*pdf,dx=0.0001), simps(np.log10(x)**2 *pdf,dx=0.0001)-simps(np.log10(x)*pdf,dx=0.0001)**2]
+
+# width of the bars
+barWidth = 0.2
+# Choose the height of bars
+bars1 = 10**stat_CHIR2[:,0]
+bars2 = 10**stat_CHIR3[:,0]
+bars3 = 10**stat_CHIR23[:,0]
+# Choose the height of the error bars (use std deviation)
+yer1 = [10**(stat_CHIR2[:,0]-np.sqrt(stat_CHIR2[:,1])), 10**(stat_CHIR2[:,0]+np.sqrt(stat_CHIR2[:,1]))]
+yer2 = [10**(stat_CHIR3[:,0]-np.sqrt(stat_CHIR3[:,1])), 10**(stat_CHIR3[:,0]+np.sqrt(stat_CHIR3[:,1]))]
+yer3 = [10**(stat_CHIR23[:,0]-np.sqrt(stat_CHIR23[:,1])), 10**(stat_CHIR23[:,0]+np.sqrt(stat_CHIR23[:,1]))]
+# The x position of bars
+r1 = np.arange(len(bars1))
+r2 = [x + barWidth for x in r1]
+r3 = [x + barWidth for x in r2]
+# Create bars
+fig = plt.figure(figsize=(10,5),dpi=200)
+matplotlib.rcParams.update({'font.size': 16})
+ax = plt.subplot(111)
+ax.bar(r1, bars1, width = barWidth, color = 'navy', edgecolor = 'black', capsize=7, label='CHIR D2')
+ax.bar(r2, bars3, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR D2+D3')
+ax.bar(r3, bars2, width = barWidth, color = 'azure', edgecolor = 'black', capsize=7, label='CHIR D3')
+ax.vlines(r1, yer1[0], yer1[1])
+ax.vlines(r3, yer2[0], yer2[1])
+ax.vlines(r2, yer3[0], yer3[1])
+# general layout
+ax.set_yscale('log')
+ax.set_ylim(0.01,1)
+par_name = [r'$\theta_{0}$',r'$\theta_{T-}$',r'$\theta_{T+}$',r'$\theta_{S-}$',r'$\theta_{S+}$',r'$\theta_{F-}$',r'$\theta_{F+}$']
+ax.set_xticks([r + barWidth for r in range(len(bars1))])
+ax.set_xticklabels(par_name)
+ax.set_ylabel('Rate [1/day]')
+plt.legend()
+# plt.show()
+plt.savefig('posterior_means_D2D3.pdf')
+
+
+
+
+# Compare posterior rate imbalance of CHIR D2 and CHIR D3
+x = np.logspace(-3,3,1000)
+stat_CHIR2 = np.zeros((3, 2))
+for idx in range(0, 3):
+    k1 = gaussian_kde(np.log10(df_CH2.values[:, 2*idx+2]/df_CH2.values[:, 2*idx+1]))
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_CHIR2[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
+stat_CHIR3 = np.zeros((3, 2))
+for idx in range(0, 3):
+    k1 = gaussian_kde(np.log10(df_CH3.values[:, 2*idx+2]/df_CH3.values[:, 2*idx+1]))
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_CHIR3[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
+stat_CHIR23 = np.zeros((3, 2))
+for idx in range(0, 3):
+    k1 = gaussian_kde(np.log10(df_CH.values[:, 2*idx+2]/df_CH.values[:, 2*idx+1]))
+    pdf = k1(np.log10(x))
+    pdf = pdf / simps(pdf, dx=0.0001)
+    stat_CHIR23[idx, :] = [simps(np.log10(x) * pdf, dx=0.0001),
+                          simps(np.log10(x) ** 2 * pdf, dx=0.0001) - simps(np.log10(x) * pdf, dx=0.0001) ** 2]
+
+# width of the bars
+barWidth = 0.2
+# Choose the height of bars
+bars1 = 10**stat_CHIR2[:,0]
+bars2 = 10**stat_CHIR3[:,0]
+bars3 = 10**stat_CHIR23[:,0]
+# Choose the height of the error bars (use std deviation)
+yer1 = [10**(stat_CHIR2[:,0]-np.sqrt(stat_CHIR2[:,1])), 10**(stat_CHIR2[:,0]+np.sqrt(stat_CHIR2[:,1]))]
+yer2 = [10**(stat_CHIR3[:,0]-np.sqrt(stat_CHIR3[:,1])), 10**(stat_CHIR3[:,0]+np.sqrt(stat_CHIR3[:,1]))]
+yer3 = [10**(stat_CHIR23[:,0]-np.sqrt(stat_CHIR23[:,1])), 10**(stat_CHIR23[:,0]+np.sqrt(stat_CHIR23[:,1]))]
+# The x position of bars
+r1 = np.arange(len(bars1))
+r2 = [x + barWidth for x in r1]
+r3 = [x + barWidth for x in r2]
+# Create bars
+fig = plt.figure(figsize=(10,5),dpi=200)
+matplotlib.rcParams.update({'font.size': 16})
+ax = plt.subplot(111)
+ax.bar(r1, bars1, width = barWidth, color = 'navy', edgecolor = 'black', capsize=7, label='CHIR D2')
+ax.bar(r2, bars3, width = barWidth, color = 'lightblue', edgecolor = 'black', capsize=7, label='CHIR D2+D3')
+ax.bar(r3, bars2, width = barWidth, color = 'azure', edgecolor = 'black', capsize=7, label='CHIR D3')
+ax.vlines(r1, yer1[0], yer1[1])
+ax.vlines(r3, yer2[0], yer2[1])
+ax.vlines(r2, yer3[0], yer3[1])
+# general layout
+ax.hlines(1,-1,3,linestyles='dashed')
+ax.set_xlim(-0.3,2.7)
+ax.set_yscale('log')
+par_name = [r'$\theta_{T+}/\theta_{T-}$',r'$\theta_{S+}/\theta_{S-}$',r'$\theta_{F+}/\theta_{F-}$']
+ax.set_xticks([r + barWidth for r in range(len(bars1))])
+ax.set_xticklabels(par_name)
+ax.set_ylabel(r'Rate imbalance')
+plt.legend()
+# plt.show()
+plt.savefig('rate_imbalance_D2D3.pdf')
