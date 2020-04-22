@@ -2,9 +2,9 @@
 import pyabc
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('Agg')
+# import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
 
@@ -13,8 +13,8 @@ from scipy.stats import gaussian_kde
 # PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
 # PATH_DAT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
 # PATH_OUT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
-PATH_DAT = '~/Stem-cell-inference/inference'
-PATH_OUT = '~/Stem-cell-inference/pyabc'
+PATH_DAT = '/lustre/home/sc049/ljs/Stem-cell-inference/inference'
+PATH_OUT = '/lustre/home/sc049/ljs/Stem-cell-inference/pyabc'
 # PATH_DAT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/inference'
 # PATH_OUT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/pyabc'
 
