@@ -9,10 +9,10 @@ from scipy.stats import gaussian_kde
 
 
 # Local path of data folder and output folder
-# PATH_DAT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
-# PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
-PATH_DAT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
-PATH_OUT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
+PATH_DAT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
+# PATH_DAT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+# PATH_OUT = '~/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
 # bounds of log-uniform priors
 PAR_MIN = 0.01
 PAR_MAX = 1.0
