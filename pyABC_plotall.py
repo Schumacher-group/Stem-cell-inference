@@ -2,19 +2,19 @@
 import pyabc
 import numpy as np
 import pandas as pd
-# import matplotlib
-# matplotlib.use('Agg')
-# import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
 
 # Local path of data folder and output folder
 # PATH_DAT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
 # PATH_OUT = '/home/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
-# PATH_DAT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
-# PATH_OUT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
-PATH_DAT = '/lustre/home/sc049/ljs/Stem-cell-inference/inference'
-PATH_OUT = '/lustre/home/sc049/ljs/Stem-cell-inference/pyabc'
+PATH_DAT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/inference'
+PATH_OUT = '/Users/linus/Dropbox/projects/cellStates/MScPhysProject/Stem-cell-inference/pyabc'
+# PATH_DAT = '/lustre/home/sc049/ljs/Stem-cell-inference/inference'
+# PATH_OUT = '/lustre/home/sc049/ljs/Stem-cell-inference/pyabc'
 # PATH_DAT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/inference'
 # PATH_OUT = 'C:/Users/Liam/Desktop/Stem-cell-inference-master/pyabc'
 
@@ -24,7 +24,6 @@ PAR_MAX = 1.0
 
 # SMC-ABC population size
 POP_SIZE = 10000
-MAX_NUM_POPNS = 20
 transition_kernels = [pyabc.transition.LocalTransition(k_fraction=0.25),
             pyabc.transition.LocalTransition(k_fraction=0.25)]
 #################################  Model definitions  #################################
@@ -262,8 +261,6 @@ par_prior = pyabc.Distribution(p1=pyabc.RV("loguniform", PAR_MIN, PAR_MAX),
                                p7=pyabc.RV("loguniform", PAR_MIN, PAR_MAX))
 priors = [par_prior,par_prior]
 
-
-
 # distance function, x: simulated data, y: experimental data
 def distance(x, y):
     d = np.zeros(3)
@@ -277,139 +274,27 @@ def distance(x, y):
         d += np.array([med_dev, mean_dev, std_dev])
     eps = np.sum(d)
     return eps
-
-
-# ## run CHIR inference ##
-# # Load experimental data (here: CHIR data)
-# xls = pd.ExcelFile(PATH_DAT+'/raw_clonal_data_adj.xlsx')
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tp-TF-D2')
-# pop1 = Tp_TF.values
-# stat_true1 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tp-TS-D2')
-# pop1 = Tp_TF.values
-# stat_true2 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tm-TF-D2')
-# pop1 = Tp_TF.values
-# stat_true3 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tm-TS-D2')
-# pop1 = Tp_TF.values
-# stat_true4 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tp-TF-D3')
-# pop1 = Tp_TF.values
-# stat_true5 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tp-TS-D3')
-# pop1 = Tp_TF.values
-# stat_true6 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tm-TF-D3')
-# pop1 = Tp_TF.values
-# stat_true7 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-# Tp_TF = pd.read_excel(xls, 'CHIR-Tm-TS-D3')
-# pop1 = Tp_TF.values
-# stat_true8 = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-#
-#
-#
-# # Metadata of experimental data (here: CHIR D2+D3 data)
-# N_set = 8
-# T_ls = [2,2,2,2,3,3,3,3]
-# marker_unobs_ls = ['S','F','S','F','S','F','S','F']
-# T_marker_ls = [1,1,0,0,1,1,0,0]
-# observations = [stat_true1,stat_true2,stat_true3,stat_true4,stat_true5,stat_true6,stat_true7,stat_true8]
-#
-# # Set up ABC-SMC inference for model comparison
-# abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
-#                     transitions=transition_kernels)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined_r2.db")
-# abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3],"data5": observations[4],"data6": observations[5],"data7": observations[6],"data8": observations[7]})
-# history = abc.run(minimum_epsilon=10, max_nr_populations=MAX_NUM_POPNS)
-#
-#
-#
-# # Metadata of experimental data (here: CHIR D2 data)
-# N_set = 4
-# T_ls = [2,2,2,2] # because runs from D0 to D2
-# marker_unobs_ls = ['S','F','S','F']
-# T_marker_ls = [1,1,0,0] # flag that initial conditions should be sampled from existing D2 populations
-# observations = [stat_true1,stat_true2,stat_true3,stat_true4]
-#
-# # Set up ABC-SMC inference for model comparison
-# abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
-#                     transitions=transition_kernels)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D2_r2.db")
-# abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-# history = abc.run(minimum_epsilon=5, max_nr_populations=MAX_NUM_POPNS)
-#
-#
-#
-# # Metadata of experimental data (here: CHIR D3 data)
-# N_set = 4
-# T_ls = [1,1,1,1] # because runs from D2 to D3
-# marker_unobs_ls = ['S','F','S','F']
-# T_marker_ls = [21,21,20,20] # flag that initial conditions should be sampled from existing D2 populations
-# observations = [stat_true5,stat_true6,stat_true7,stat_true8]
-#
-# # Set up ABC-SMC inference for model comparison
-# abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
-#                     transitions=transition_kernels)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D3_r2.db")
-# abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-# history = abc.run(minimum_epsilon=5, max_nr_populations=MAX_NUM_POPNS)
-#
-#
-
-## run EPISC inference ##
-# Metadata of experimental data (here: EPISC D3 data)
-N_set = 4
-T_ls = [3,3,3,3]
-marker_unobs_ls = ['S','F','S','F']
-T_marker_ls = [1,1,0,0]
-
-
-# Load experimental data (here: EPISC D3 data)
-xls = pd.ExcelFile(PATH_DAT+'/raw_clonal_data_adj.xlsx')
-Tp_TF = pd.read_excel(xls, 'EPISC-Tp-TF-D3')
-pop1 = Tp_TF.values
-stat_true1_episc = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-Tp_TF = pd.read_excel(xls, 'EPISC-Tp-TS-D3')
-pop1 = Tp_TF.values
-stat_true2_episc = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-Tp_TF = pd.read_excel(xls, 'EPISC-Tm-TF-D3')
-pop1 = Tp_TF.values
-stat_true3_episc = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-Tp_TF = pd.read_excel(xls, 'EPISC-Tm-TS-D3')
-pop1 = Tp_TF.values
-stat_true4_episc = [np.mean(pop1,axis=0), np.median(pop1,axis=0), np.std(pop1,axis=0)]
-observations = [stat_true1_episc,stat_true2_episc,stat_true3_episc,stat_true4_episc]
-
-# Set up ABC-SMC inference for model comparison
-abc = pyabc.ABCSMC(models, priors, distance, population_size=POP_SIZE,
-                    transitions=transition_kernels)
-# alternatively try #pyabc.populationstrategy.AdaptivePopulationSize(POP_SIZE,mean_cv=0.10),
-db_path = ("sqlite:///"+PATH_OUT+"/EPISC_D3_r3.db")
-abc.new(db_path, {"data1": observations[0],"data2": observations[1],"data3": observations[2],"data4": observations[3]})
-history = abc.run(minimum_epsilon=5, max_nr_populations=MAX_NUM_POPNS)
-
-
+    
 # VISUALIZATION (assuming the EPISC run is stored in the same directory with name 'EPISC_D3.db')
 
-# # load existing CHIR run
-# abc_continued = pyabc.ABCSMC(models, priors, distance)
-# db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined_r2.db")
-# abc_continued.load(db_path, 1) # second argument is abc_id
-# df_CH, w_CH = abc_continued.history.get_distribution(m=0)
-# # Visualise model comparison
-# pyabc.visualization.plot_model_probabilities(abc_continued.history)
-# plt.savefig("model_comparison_CHIR_r2.pdf")
+# load existing CHIR run
+abc_continued = pyabc.ABCSMC(models, priors, distance)
+db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined_r2.db")
+abc_continued.load(db_path, 1) # second argument is abc_id
+df_CH, w_CH = abc_continued.history.get_distribution(m=0)
+# Visualise model comparison
+pyabc.visualization.plot_model_probabilities(abc_continued.history)
+plt.savefig("model_comparison_CHIR_r2.pdf")
 
-# # load existing EPISC run
-# abc_continued = pyabc.ABCSMC(models, priors, distance)
-# db_path = ("sqlite:///"+PATH_OUT+"/EPISC_D3_r2.db")
-# abc_continued.load(db_path, 1)
-# df_EP, w_EP = abc_continued.history.get_distribution(m=0)
-# # Visualise model comparison
-# pyabc.visualization.plot_model_probabilities(abc_continued.history)
-# plt.savefig("model_comparison_EPISC_D3_r2.pdf")
-#
+# load existing EPISC run
+abc_continued = pyabc.ABCSMC(models, priors, distance)
+db_path = ("sqlite:///"+PATH_OUT+"/EPISC_D3_r2.db")
+abc_continued.load(db_path, 1)
+df_EP, w_EP = abc_continued.history.get_distribution(m=0)
+# Visualise model comparison
+pyabc.visualization.plot_model_probabilities(abc_continued.history)
+plt.savefig("model_comparison_EPISC_D3_r2.pdf")
+
 # # load existing CHIR D2 run
 # abc_continued = pyabc.ABCSMC(models, priors, distance)
 # db_path = ("sqlite:///"+PATH_OUT+"/CHIR_D2_r2.db")
