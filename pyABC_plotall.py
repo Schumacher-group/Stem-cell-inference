@@ -274,26 +274,26 @@ def distance(x, y):
         d += np.array([med_dev, mean_dev, std_dev])
     eps = np.sum(d)
     return eps
-    
+
 # VISUALIZATION (assuming the EPISC run is stored in the same directory with name 'EPISC_D3.db')
 
 # load existing CHIR run
 abc_continued = pyabc.ABCSMC(models, priors, distance)
-db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined_r2.db")
+db_path = ("sqlite:///"+PATH_OUT+"/CHIR_combined_r3.db")
 abc_continued.load(db_path, 1) # second argument is abc_id
 df_CH, w_CH = abc_continued.history.get_distribution(m=0)
 # Visualise model comparison
 pyabc.visualization.plot_model_probabilities(abc_continued.history)
-plt.savefig("model_comparison_CHIR_r2.pdf")
+plt.savefig("model_comparison_CHIR_r3.pdf")
 
 # load existing EPISC run
 abc_continued = pyabc.ABCSMC(models, priors, distance)
-db_path = ("sqlite:///"+PATH_OUT+"/EPISC_D3_r2.db")
-abc_continued.load(db_path, 1)
+db_path = ("sqlite:///"+PATH_OUT+"/EPISC_D3_r3.db")
+abc_continued.load(db_path, 2)
 df_EP, w_EP = abc_continued.history.get_distribution(m=0)
 # Visualise model comparison
 pyabc.visualization.plot_model_probabilities(abc_continued.history)
-plt.savefig("model_comparison_EPISC_D3_r2.pdf")
+plt.savefig("model_comparison_EPISC_D3_r3.pdf")
 
 # # load existing CHIR D2 run
 # abc_continued = pyabc.ABCSMC(models, priors, distance)
