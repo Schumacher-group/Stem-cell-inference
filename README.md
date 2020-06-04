@@ -29,4 +29,4 @@ EPISC_data.py
 
 EPISC_MCMC.py
 	Older version of algorithm which tried exact inference for EpiSC model using the original MCMC algorithm.
-	Didnt work because state space too large.
+	Worked less well because state space too large.
