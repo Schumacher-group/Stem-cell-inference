@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(0, "C:\\Users\\Liam\\Desktop\\Master\\code")
+sys.path.insert(0, "INSERT PATH TO DTO_X/Y SCRIPT HERE")
 import DTO_X
 import DTO_Y
 import DTO_MS
@@ -154,7 +154,7 @@ plt.show()
 
 # %% calculate Bayes Factor and plot 1
 
-OUTPUTPATH = 'C:/Users/Liam/Desktop/Master/inference/snapshots/comparison/'
+OUTPUTPATH = 'INSERT OUTPUT PATH HERE'
 BR_HM = HM_X/HM_Y
 
 fig = plt.figure(figsize=(20,6))
@@ -218,7 +218,7 @@ plt.savefig(OUTPUTPATH+'HM_TI_XdY_T'+str(T)+'-dT'+str(dT)+'_init'+str(pop0)+'_fi
 
 # %% # %% calculate Bayes Factor and plot 2
 
-OUTPUTPATH = 'C:/Users/Liam/Desktop/Master/inference/snapshots/comparison/'
+OUTPUTPATH = 'INSERT OUTPUT PATH HERE'
 BR_HM = HM_X/HM_Y
 
 fig = plt.figure(figsize=(6,6))
