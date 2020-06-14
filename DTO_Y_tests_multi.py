@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.stats import gaussian_kde
 import sys
-sys.path.insert(0, "C:\\Users\\Liam\\Desktop\\Master\\code")
+sys.path.insert(0, "INSERT PATH TO DTO_Y SCRIPT HERE")
 import DTO_Y
 trajectory_Y = DTO_Y.trajectory_Y
 get_population_list = DTO_Y.get_population_list
