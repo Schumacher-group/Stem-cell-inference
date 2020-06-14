@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
 import sys
-sys.path.insert(0, "C:\\Users\\Liam\\Desktop\\Master\\code")
+sys.path.insert(0, "INSERT PATH TO DTO_X SCRIPT HERE")
 import DTO_X
 trajectory_X = DTO_X.trajectory_X
 get_population_list = DTO_X.get_population_list
