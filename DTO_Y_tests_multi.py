@@ -48,7 +48,7 @@ print(pop[-1,0:2])
 #%% do MCMC runs with uniform snapshot times
 
 # create uniform snapshots
-OUTPUTPATH = 'C:/Users/Liam/Desktop/Master/inference/snapshots/model_Y/test/'
+OUTPUTPATH = 'INSERT OUTPUT PATH HERE'
 dT = 0.5
 pop_SS = np.zeros((0,2))
 for i in range(0,int(T/dT)+1):
