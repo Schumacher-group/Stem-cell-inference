@@ -51,7 +51,7 @@ print(pop[-1,0:2])
 #%% do MCMC runs with uniform snapshot times
 
 # create uniform snapshots
-OUTPUTPATH = 'C:/Users/Liam/Desktop/Master/inference/snapshots/model_X/'#test/multi/2-1-1/uniform_SS/'
+OUTPUTPATH = 'INSERT OUTPUT PATH HERE'
 dT = 2
 pop_SS = np.zeros((0,2))
 for i in range(0,int(T/dT)+1):
@@ -69,7 +69,7 @@ plot_all(output_par,mA,OUTPUTPATH,SMPL_LIM,pop,par,traj,T,dT)
 #%% do MCMC runs with inhom snapshot times
 
 # create inhom snapshots with optimal sampling strategy
-OUTPUTPATH = 'C:/Users/Liam/Desktop/Master/inference/snapshots/model_X/test/' # multi/2-1-1/inhom_SS/'
+OUTPUTPATH = 'INSERT OUTPUT PATH HERE'
 T_arr = get_optSST(par,T,2)
 pop_SS = np.zeros((0,2))
 for i in range(0,len(T_arr)):
