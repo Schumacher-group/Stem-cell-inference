@@ -1,3 +1,5 @@
+Code associated with "Coupled differentiation and division of embryonic stem cells inferred from clonal snapshots", Ruske et al., 2020, Physical Biology 17 065009, http://dx.doi.org/10.1088/1478-3975/aba041
+
 ============ Stem cell inference code ============ 
 
 Please note: 'Model X/Y' in the following Python files refers to model C/U as defined in the manuscript, respectively.
